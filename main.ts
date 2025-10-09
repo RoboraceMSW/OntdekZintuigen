@@ -11,6 +11,12 @@ function volg_licht () {
         }
     }
 }
+function CheckControlCode () {
+    Buf0 = IRbuffer[0]
+    Buf0 = IRbuffer[1]
+    Buf0 = IRbuffer[2]
+    Buf0 = IRbuffer[3]
+}
 function botsdetectie () {
     if (Math.abs(input.acceleration(Dimension.Z)) > 500) {
         strip.showColor(neopixel.colors(NeoPixelColors.Red))
@@ -20,9 +26,66 @@ function botsdetectie () {
     strip.clear()
     strip.show()
 }
+function IR_Actie_new () {
+    IRcode = IR.IR_read()
+    IRbuffer.unshift(IRcode)
+    IRbuffer.pop()
+    CheckControlCode()
+}
 IR.IR_callbackUser(function () {
-    IR_action()
+    IR_Actie_new()
 })
+function ToonKnop () {
+    if (IRcode == Afstandsbediening.een()) {
+        basic.showString("1")
+    } else if (IRcode == Afstandsbediening.twee()) {
+        basic.showString("2")
+    } else if (IRcode == Afstandsbediening.drie()) {
+        basic.showString("3")
+    } else if (IRcode == Afstandsbediening.vier()) {
+        basic.showString("4")
+    } else if (IRcode == Afstandsbediening.vijf()) {
+        basic.showString("5")
+    } else if (IRcode == Afstandsbediening.zes()) {
+        basic.showString("6")
+    } else if (IRcode == Afstandsbediening.zeven()) {
+        basic.showString("7")
+    } else if (IRcode == Afstandsbediening.acht()) {
+        basic.showString("8")
+    } else if (IRcode == Afstandsbediening.negen()) {
+        basic.showString("9")
+    } else if (IRcode == Afstandsbediening.nul()) {
+        basic.showString("0")
+    } else if (IRcode == Afstandsbediening.op()) {
+        basic.showArrow(ArrowNames.North)
+    } else if (IRcode == Afstandsbediening.neer()) {
+        basic.showArrow(ArrowNames.South)
+    } else if (IRcode == Afstandsbediening.links()) {
+        basic.showArrow(ArrowNames.East)
+    } else if (IRcode == Afstandsbediening.rechts()) {
+        basic.showArrow(ArrowNames.West)
+    } else if (IRcode == Afstandsbediening.ster()) {
+        basic.showLeds(`
+            # . # . #
+            . # # # .
+            # # # # #
+            . # # # .
+            # . # . #
+            `)
+    } else if (IRcode == Afstandsbediening.hekje()) {
+        basic.showLeds(`
+            . # . # .
+            # # # # #
+            . # . # .
+            # # # # #
+            . # . # .
+            `)
+    } else if (IRcode == Afstandsbediening.ok()) {
+        basic.showIcon(IconNames.Yes)
+    } else {
+    	
+    }
+}
 function echo_serieel () {
     let avdist = 0
     serial.writeValue("afstand", avdist)
@@ -68,21 +131,10 @@ function lawaai () {
 function init () {
     serial.redirectToUSB()
     IR.IR_init()
-    Maqueen_V5.patrolling(Maqueen_V5.Patrolling.ON)
     strip = neopixel.create(DigitalPin.P15, 4, NeoPixelMode.RGB)
     Afstandsbediening.init_rc_hx1838()
-    herhaal = 3
-    volglijn = 0
-    basic.showString("Ik ben klaar")
-    ccw = 1
     input.setAccelerometerRange(AcceleratorRange.OneG)
-    lijst = [
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
+    IRbuffer = [
     0,
     0,
     0,
@@ -235,6 +287,7 @@ function Volglijn () {
     }
 }
 function average (afstand: number) {
+    let lijst: number[] = []
     lijst.pop()
     lijst.unshift(toon)
     som = 0
@@ -248,29 +301,30 @@ let som = 0
 let wasaan = 0
 let lowspeed = 0
 let fullspeed = 0
-let IRcode = 0
+let volglijn = 0
 let avtone = 0
 let toon = 0
 let afstand = 0
-let lijst: number[] = []
-let volglijn = 0
 let herhaal = 0
 let ccw = 0
+let IRcode = 0
 let strip: neopixel.Strip = null
+let IRbuffer: number[] = []
+let Buf0 = 0
 Maqueen_V5.I2CInit()
 init()
 basic.forever(function () {
-    echo_serieel()
+	
 })
 basic.forever(function () {
-    volg_licht()
+	
 })
 basic.forever(function () {
-    afstand_en_geluid()
+	
 })
 basic.forever(function () {
-    botsdetectie()
+	
 })
 basic.forever(function () {
-    Volglijn()
+	
 })
