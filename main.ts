@@ -1,3 +1,6 @@
+/**
+ * Kennismakingsprogramma om sensoren en actuatoren te leren kennen
+ */
 function volg_licht () {
     if (Maqueen_V5.readLightIntensity(Maqueen_V5.DirectionType2.Left) + Maqueen_V5.readLightIntensity(Maqueen_V5.DirectionType2.Right) > 3000) {
         if (Maqueen_V5.readLightIntensity(Maqueen_V5.DirectionType2.Left) < Maqueen_V5.readLightIntensity(Maqueen_V5.DirectionType2.Right) + 200) {
@@ -12,10 +15,28 @@ function volg_licht () {
     }
 }
 function CheckControlCode () {
-    Buf0 = IRbuffer[0]
-    Buf0 = IRbuffer[1]
-    Buf0 = IRbuffer[2]
-    Buf0 = IRbuffer[3]
+    Buf0 = Bufstat[0]
+    Buf1 = Bufstat[1]
+    Buf2 = Bufstat[2]
+    Buf3 = Bufstat[3]
+    if (Buf3 == "*" && (Buf2 == "num" && (Buf1 == "num" && Buf0 == "hekje"))) {
+        iscontrolcode = 1
+        ishashcode = 0
+        isnum = 0
+    } else if (Buf0 == "hekje" && (Buf1 == "num" && false)) {
+        ishashcode = 1
+        iscontrolcode = 0
+        isnum = 0
+    } else if (Buf0 == "num") {
+        isnum = 1
+        ishashcode = 0
+        iscontrolcode = 0
+    }
+    if (iscontrolcode && (IRbuffer[1] == "1" && IRbuffer[2] == "1")) {
+        mode = "verken"
+    } else if (iscontrolcode && (IRbuffer[1] == "2" && IRbuffer[2] == "2")) {
+        mode = "rijden"
+    }
 }
 function botsdetectie () {
     if (Math.abs(input.acceleration(Dimension.Z)) > 500) {
@@ -28,8 +49,9 @@ function botsdetectie () {
 }
 function IR_Actie_new () {
     IRcode = IR.IR_read()
-    IRbuffer.unshift(IRcode)
+    leesknop()
     IRbuffer.pop()
+    Bufstat.pop()
     CheckControlCode()
 }
 IR.IR_callbackUser(function () {
@@ -37,51 +59,39 @@ IR.IR_callbackUser(function () {
 })
 function ToonKnop () {
     if (IRcode == Afstandsbediening.een()) {
-        basic.showString("1")
+    	
     } else if (IRcode == Afstandsbediening.twee()) {
-        basic.showString("2")
+    	
     } else if (IRcode == Afstandsbediening.drie()) {
-        basic.showString("3")
+    	
     } else if (IRcode == Afstandsbediening.vier()) {
-        basic.showString("4")
+    	
     } else if (IRcode == Afstandsbediening.vijf()) {
-        basic.showString("5")
+    	
     } else if (IRcode == Afstandsbediening.zes()) {
-        basic.showString("6")
+    	
     } else if (IRcode == Afstandsbediening.zeven()) {
-        basic.showString("7")
+    	
     } else if (IRcode == Afstandsbediening.acht()) {
-        basic.showString("8")
+    	
     } else if (IRcode == Afstandsbediening.negen()) {
-        basic.showString("9")
+    	
     } else if (IRcode == Afstandsbediening.nul()) {
-        basic.showString("0")
+    	
     } else if (IRcode == Afstandsbediening.op()) {
-        basic.showArrow(ArrowNames.North)
+    	
     } else if (IRcode == Afstandsbediening.neer()) {
-        basic.showArrow(ArrowNames.South)
+    	
     } else if (IRcode == Afstandsbediening.links()) {
-        basic.showArrow(ArrowNames.East)
+    	
     } else if (IRcode == Afstandsbediening.rechts()) {
-        basic.showArrow(ArrowNames.West)
+    	
     } else if (IRcode == Afstandsbediening.ster()) {
-        basic.showLeds(`
-            # . # . #
-            . # # # .
-            # # # # #
-            . # # # .
-            # . # . #
-            `)
+    	
     } else if (IRcode == Afstandsbediening.hekje()) {
-        basic.showLeds(`
-            . # . # .
-            # # # # #
-            . # . # .
-            # # # # #
-            . # . # .
-            `)
+    	
     } else if (IRcode == Afstandsbediening.ok()) {
-        basic.showIcon(IconNames.Yes)
+    	
     } else {
     	
     }
@@ -135,11 +145,21 @@ function init () {
     Afstandsbediening.init_rc_hx1838()
     input.setAccelerometerRange(AcceleratorRange.OneG)
     IRbuffer = [
-    0,
-    0,
-    0,
-    0
+    "",
+    "",
+    "",
+    ""
     ]
+    Bufstat = [
+    "",
+    "",
+    "",
+    ""
+    ]
+    isnum = 0
+    iscontrolcode = 0
+    ishashcode = 0
+    mode = "verken"
 }
 function afstand_en_geluid () {
     afstand = Maqueen_V5.Ultrasonic()
@@ -249,6 +269,60 @@ function IR_action () {
         basic.showIcon(IconNames.Diamond)
     }
 }
+function leesknop () {
+    if (IRcode == Afstandsbediening.ster()) {
+        IRbuffer.unshift("*")
+        Bufstat.unshift("ster")
+    } else if (IRcode == Afstandsbediening.hekje()) {
+        IRbuffer.unshift("#")
+        Bufstat.unshift("hekje")
+    } else if (IRcode == Afstandsbediening.een()) {
+        IRbuffer.unshift("1")
+        Bufstat.unshift("num")
+    } else if (IRcode == Afstandsbediening.twee()) {
+        IRbuffer.unshift("2")
+        Bufstat.unshift("num")
+    } else if (IRcode == Afstandsbediening.drie()) {
+        IRbuffer.unshift("3")
+        Bufstat.unshift("num")
+    } else if (IRcode == Afstandsbediening.vier()) {
+        IRbuffer.unshift("4")
+        Bufstat.unshift("num")
+    } else if (IRcode == Afstandsbediening.vijf()) {
+        IRbuffer.unshift("5")
+        Bufstat.unshift("num")
+    } else if (IRcode == Afstandsbediening.zes()) {
+        IRbuffer.unshift("6")
+        Bufstat.unshift("num")
+    } else if (IRcode == Afstandsbediening.zeven()) {
+        IRbuffer.unshift("7")
+        Bufstat.unshift("num")
+    } else if (IRcode == Afstandsbediening.acht()) {
+        IRbuffer.unshift("8")
+        Bufstat.unshift("num")
+    } else if (IRcode == Afstandsbediening.negen()) {
+        IRbuffer.unshift("9")
+        Bufstat.unshift("num")
+    } else if (IRcode == Afstandsbediening.nul()) {
+        IRbuffer.unshift("0")
+        Bufstat.unshift("num")
+    } else if (IRcode == Afstandsbediening.op()) {
+        IRbuffer.unshift("^")
+        Bufstat.unshift("ctrl")
+    } else if (IRcode == Afstandsbediening.neer()) {
+        IRbuffer.unshift("v")
+        Bufstat.unshift("ctrl")
+    } else if (IRcode == Afstandsbediening.links()) {
+        IRbuffer.unshift("<")
+        Bufstat.unshift("ctrl")
+    } else if (IRcode == Afstandsbediening.rechts()) {
+        IRbuffer.unshift(">")
+        Bufstat.unshift("ctrl")
+    } else if (IRcode == Afstandsbediening.ok()) {
+        IRbuffer.unshift("y")
+        Bufstat.unshift("ctrl")
+    }
+}
 function Volglijn () {
     fullspeed = 50
     lowspeed = 10
@@ -291,12 +365,11 @@ function average (afstand: number) {
     lijst.pop()
     lijst.unshift(toon)
     som = 0
-    for (let index = 0; index <= 9; index++) {
-        som = som + lijst[index]
+    for (let index2 = 0; index2 <= 9; index2++) {
+        som = som + lijst[index2]
     }
     avtone = som / 10
 }
-// Kennismakingsprogramma om sensoren en actuatoren te leren kennen
 let som = 0
 let wasaan = 0
 let lowspeed = 0
@@ -309,8 +382,16 @@ let herhaal = 0
 let ccw = 0
 let IRcode = 0
 let strip: neopixel.Strip = null
-let IRbuffer: number[] = []
-let Buf0 = 0
+let mode = ""
+let IRbuffer: string[] = []
+let isnum = 0
+let ishashcode = 0
+let iscontrolcode = 0
+let Buf3 = ""
+let Buf2 = ""
+let Buf1 = ""
+let Bufstat: string[] = []
+let Buf0 = ""
 Maqueen_V5.I2CInit()
 init()
 basic.forever(function () {
