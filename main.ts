@@ -1,6 +1,25 @@
 /**
  * Kennismakingsprogramma om sensoren en actuatoren te leren kennen
  */
+function setLkleur () {
+    Lkleur += 1
+    Lkleur = Lkleur % 7
+    if (Lkleur == 0) {
+        Maqueen_V5.setRgblLed(Maqueen_V5.DirectionType.Left, Maqueen_V5.CarLightColors.Green)
+    } else if (Lkleur == 1) {
+        Maqueen_V5.setRgblLed(Maqueen_V5.DirectionType.Left, Maqueen_V5.CarLightColors.Yellow)
+    } else if (Lkleur == 2) {
+        Maqueen_V5.setRgblLed(Maqueen_V5.DirectionType.Left, Maqueen_V5.CarLightColors.Blue)
+    } else if (Lkleur == 3) {
+        Maqueen_V5.setRgblLed(Maqueen_V5.DirectionType.Left, Maqueen_V5.CarLightColors.Purple)
+    } else if (Lkleur == 4) {
+        Maqueen_V5.setRgblLed(Maqueen_V5.DirectionType.Left, Maqueen_V5.CarLightColors.Cyan)
+    } else if (Lkleur == 5) {
+        Maqueen_V5.setRgblLed(Maqueen_V5.DirectionType.Left, Maqueen_V5.CarLightColors.White)
+    } else if (Lkleur == 6) {
+        Maqueen_V5.setRgblLed(Maqueen_V5.DirectionType.Left, Maqueen_V5.CarLightColors.Black)
+    }
+}
 function volg_licht () {
     if (Maqueen_V5.readLightIntensity(Maqueen_V5.DirectionType2.Left) + Maqueen_V5.readLightIntensity(Maqueen_V5.DirectionType2.Right) > 3000) {
         if (Maqueen_V5.readLightIntensity(Maqueen_V5.DirectionType2.Left) < Maqueen_V5.readLightIntensity(Maqueen_V5.DirectionType2.Right) + 200) {
@@ -19,24 +38,36 @@ function CheckControlCode () {
     Buf1 = Bufstat[1]
     Buf2 = Bufstat[2]
     Buf3 = Bufstat[3]
-    if (Buf3 == "*" && (Buf2 == "num" && (Buf1 == "num" && Buf0 == "hekje"))) {
-        iscontrolcode = 1
+    if (Buf3 == "ster" && (Buf2 == "num" && (Buf1 == "num" && Buf0 == "hekje"))) {
+        IsSwitchMode = 1
         ishashcode = 0
         isnum = 0
-    } else if (Buf0 == "hekje" && (Buf1 == "num" && false)) {
-        ishashcode = 1
         iscontrolcode = 0
+    } else if (Buf1 == "hekje" && Buf0 == "num") {
+        ishashcode = 1
+        IsSwitchMode = 0
         isnum = 0
+        iscontrolcode = 0
+        music.play(music.tonePlayable(523, music.beat(BeatFraction.Whole)), music.PlaybackMode.UntilDone)
     } else if (Buf0 == "num") {
         isnum = 1
         ishashcode = 0
+        IsSwitchMode = 0
         iscontrolcode = 0
+    } else if (Buf0 == "ctrl") {
+        iscontrolcode = 1
+        isnum = 0
+        ishashcode = 0
+        IsSwitchMode = 0
     }
-    if (iscontrolcode && (IRbuffer[1] == "1" && IRbuffer[2] == "1")) {
+    if (IsSwitchMode && (IRbuffer[1] == "1" && IRbuffer[2] == "1")) {
         mode = "verken"
-    } else if (iscontrolcode && (IRbuffer[1] == "2" && IRbuffer[2] == "2")) {
+        music.play(music.stringPlayable("C C E E G G C5 C5 ", 800), music.PlaybackMode.UntilDone)
+    } else if (IsSwitchMode && (IRbuffer[1] == "2" && IRbuffer[2] == "2")) {
         mode = "rijden"
+        music.play(music.stringPlayable("C5 C5 G G E E C C ", 800), music.PlaybackMode.UntilDone)
     }
+    IsSwitchMode = 0
 }
 function botsdetectie () {
     if (Math.abs(input.acceleration(Dimension.Z)) > 500) {
@@ -53,45 +84,93 @@ function IR_Actie_new () {
     IRbuffer.pop()
     Bufstat.pop()
     CheckControlCode()
+    ToonKnop()
 }
 IR.IR_callbackUser(function () {
     IR_Actie_new()
 })
 function ToonKnop () {
-    if (IRcode == Afstandsbediening.een()) {
-    	
-    } else if (IRcode == Afstandsbediening.twee()) {
-    	
-    } else if (IRcode == Afstandsbediening.drie()) {
-    	
-    } else if (IRcode == Afstandsbediening.vier()) {
-    	
-    } else if (IRcode == Afstandsbediening.vijf()) {
-    	
-    } else if (IRcode == Afstandsbediening.zes()) {
-    	
-    } else if (IRcode == Afstandsbediening.zeven()) {
-    	
-    } else if (IRcode == Afstandsbediening.acht()) {
-    	
-    } else if (IRcode == Afstandsbediening.negen()) {
-    	
-    } else if (IRcode == Afstandsbediening.nul()) {
-    	
-    } else if (IRcode == Afstandsbediening.op()) {
-    	
-    } else if (IRcode == Afstandsbediening.neer()) {
-    	
-    } else if (IRcode == Afstandsbediening.links()) {
-    	
-    } else if (IRcode == Afstandsbediening.rechts()) {
-    	
-    } else if (IRcode == Afstandsbediening.ster()) {
-    	
-    } else if (IRcode == Afstandsbediening.hekje()) {
-    	
-    } else if (IRcode == Afstandsbediening.ok()) {
-    	
+    if (mode == "verken" && (isnum || iscontrolcode)) {
+        if (IRcode == Afstandsbediening.een()) {
+            basic.showNumber(1)
+        } else if (IRcode == Afstandsbediening.twee()) {
+            basic.showNumber(2)
+        } else if (IRcode == Afstandsbediening.drie()) {
+            basic.showNumber(3)
+        } else if (IRcode == Afstandsbediening.vier()) {
+            basic.showNumber(4)
+        } else if (IRcode == Afstandsbediening.vijf()) {
+            basic.showNumber(5)
+        } else if (IRcode == Afstandsbediening.zes()) {
+            basic.showNumber(6)
+        } else if (IRcode == Afstandsbediening.zeven()) {
+            basic.showNumber(7)
+        } else if (IRcode == Afstandsbediening.acht()) {
+            basic.showNumber(8)
+        } else if (IRcode == Afstandsbediening.negen()) {
+            basic.showNumber(9)
+        } else if (IRcode == Afstandsbediening.nul()) {
+            basic.showNumber(0)
+        } else if (IRcode == Afstandsbediening.op()) {
+            basic.showArrow(ArrowNames.North)
+        } else if (IRcode == Afstandsbediening.neer()) {
+            basic.showArrow(ArrowNames.South)
+        } else if (IRcode == Afstandsbediening.links()) {
+            basic.showArrow(ArrowNames.East)
+        } else if (IRcode == Afstandsbediening.rechts()) {
+            basic.showArrow(ArrowNames.West)
+        } else if (IRcode == Afstandsbediening.ster()) {
+        	
+        } else if (IRcode == Afstandsbediening.hekje()) {
+        	
+        } else if (IRcode == Afstandsbediening.ok()) {
+            basic.showIcon(IconNames.Yes)
+        } else {
+        	
+        }
+    } else if (mode == "verken" && ishashcode) {
+        if (IRbuffer[0] == "1") {
+            KoplampL = !(KoplampL)
+            if (KoplampL) {
+                Maqueen_V5.setRgblLed(Maqueen_V5.DirectionType.Left, Maqueen_V5.CarLightColors.Red)
+            } else {
+                Maqueen_V5.setRgbOff(Maqueen_V5.DirectionType.Left)
+            }
+        } else if (IRbuffer[0] == "2") {
+            KoplampR = !(KoplampR)
+            if (KoplampR) {
+                Maqueen_V5.setRgblLed(Maqueen_V5.DirectionType.Right, Maqueen_V5.CarLightColors.Red)
+            } else {
+                Maqueen_V5.setRgbOff(Maqueen_V5.DirectionType.Right)
+            }
+        } else if (IRbuffer[0] == "3") {
+            setLkleur()
+        } else if (IRbuffer[0] == "4") {
+            setRkleur()
+        } else if (IRbuffer[0] == "5") {
+            Koplampdisco = !(Koplampdisco)
+            if (Koplampdisco) {
+                Maqueen_V5.setRgbchange(Maqueen_V5.DirectionType.All, Maqueen_V5.SpeedGrade.speed5)
+            } else {
+                Maqueen_V5.setRgbOff(Maqueen_V5.DirectionType.All)
+            }
+        } else if (IRbuffer[0] == "6") {
+            soundface()
+        } else if (IRbuffer[0] == "7") {
+            Maqueen_V5.motorRun(Maqueen_V5.Motors.M1, Maqueen_V5.Dir.CW, 130)
+            Maqueen_V5.motorRun(Maqueen_V5.Motors.M2, Maqueen_V5.Dir.CCW, 130)
+            basic.pause(1000)
+            Maqueen_V5.motorStop(Maqueen_V5.Motors.All)
+        } else if (IRbuffer[0] == "8") {
+            Maqueen_V5.motorRun(Maqueen_V5.Motors.M1, Maqueen_V5.Dir.CCW, 130)
+            Maqueen_V5.motorRun(Maqueen_V5.Motors.M2, Maqueen_V5.Dir.CW, 130)
+            basic.pause(1000)
+            Maqueen_V5.motorStop(Maqueen_V5.Motors.All)
+        } else if (IRbuffer[0] == "9") {
+        	
+        } else if (IRbuffer[0] == "0") {
+        	
+        }
     } else {
     	
     }
@@ -159,7 +238,27 @@ function init () {
     isnum = 0
     iscontrolcode = 0
     ishashcode = 0
+    IsSwitchMode = 0
     mode = "verken"
+}
+function setRkleur () {
+    Rkleur += 1
+    Rkleur = Rkleur % 7
+    if (Rkleur == 0) {
+        Maqueen_V5.setRgblLed(Maqueen_V5.DirectionType.Right, Maqueen_V5.CarLightColors.Green)
+    } else if (Rkleur == 1) {
+        Maqueen_V5.setRgblLed(Maqueen_V5.DirectionType.Right, Maqueen_V5.CarLightColors.Yellow)
+    } else if (Rkleur == 2) {
+        Maqueen_V5.setRgblLed(Maqueen_V5.DirectionType.Right, Maqueen_V5.CarLightColors.Blue)
+    } else if (Rkleur == 3) {
+        Maqueen_V5.setRgblLed(Maqueen_V5.DirectionType.Right, Maqueen_V5.CarLightColors.Purple)
+    } else if (Rkleur == 4) {
+        Maqueen_V5.setRgblLed(Maqueen_V5.DirectionType.Right, Maqueen_V5.CarLightColors.Cyan)
+    } else if (Rkleur == 5) {
+        Maqueen_V5.setRgblLed(Maqueen_V5.DirectionType.Right, Maqueen_V5.CarLightColors.White)
+    } else if (Rkleur == 6) {
+        Maqueen_V5.setRgblLed(Maqueen_V5.DirectionType.Right, Maqueen_V5.CarLightColors.Black)
+    }
 }
 function afstand_en_geluid () {
     afstand = Maqueen_V5.Ultrasonic()
@@ -177,6 +276,47 @@ function afstand_en_geluid () {
             lawaai()
         }
     }
+}
+function soundface () {
+    SFcount = SFcount % 4
+    if (SFcount == 0) {
+        basic.showLeds(`
+            # . . . #
+            . . # . .
+            . . # . .
+            # . . . #
+            . # # # .
+            `)
+        music.play(music.stringPlayable("C D E F G - - - ", 800), music.PlaybackMode.UntilDone)
+    } else if (SFcount == 1) {
+        basic.showLeds(`
+            # . . . #
+            . . # . .
+            # . # . #
+            # . . . #
+            . # # # .
+            `)
+        music.play(music.stringPlayable("D E F G A B C5 - ", 800), music.PlaybackMode.UntilDone)
+    } else if (SFcount == 2) {
+        basic.showLeds(`
+            # . . . #
+            . . # . .
+            . . . . .
+            . # # # .
+            # . . . #
+            `)
+        music.play(music.stringPlayable("A G F E D C - - ", 800), music.PlaybackMode.UntilDone)
+    } else if (SFcount == 3) {
+        basic.showLeds(`
+            # . . . #
+            . . . . .
+            . # # # .
+            # . . . #
+            . # # # .
+            `)
+        music.play(music.stringPlayable("C C5 C C5 C C5 C - ", 300), music.PlaybackMode.UntilDone)
+    }
+    SFcount += 1
 }
 function IR_action () {
     IRcode = IR.IR_read()
@@ -322,6 +462,7 @@ function leesknop () {
         IRbuffer.unshift("y")
         Bufstat.unshift("ctrl")
     }
+    music.play(music.tonePlayable(988, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.UntilDone)
 }
 function Volglijn () {
     fullspeed = 50
@@ -375,23 +516,30 @@ let wasaan = 0
 let lowspeed = 0
 let fullspeed = 0
 let volglijn = 0
+let SFcount = 0
 let avtone = 0
 let toon = 0
 let afstand = 0
+let Rkleur = 0
 let herhaal = 0
 let ccw = 0
+let Koplampdisco = false
+let KoplampR = false
+let KoplampL = false
 let IRcode = 0
 let strip: neopixel.Strip = null
 let mode = ""
 let IRbuffer: string[] = []
+let iscontrolcode = 0
 let isnum = 0
 let ishashcode = 0
-let iscontrolcode = 0
+let IsSwitchMode = 0
 let Buf3 = ""
 let Buf2 = ""
 let Buf1 = ""
 let Bufstat: string[] = []
 let Buf0 = ""
+let Lkleur = 0
 Maqueen_V5.I2CInit()
 init()
 basic.forever(function () {
