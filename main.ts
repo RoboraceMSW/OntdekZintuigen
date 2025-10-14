@@ -20,6 +20,14 @@ function setLkleur () {
         Maqueen_V5.setRgblLed(Maqueen_V5.DirectionType.Left, Maqueen_V5.CarLightColors.Black)
     }
 }
+function IR_Actie () {
+    IRcode = IR.IR_read()
+    leesknop()
+    IRbuffer.pop()
+    Bufstat.pop()
+    CheckControlCode()
+    ToonKnop()
+}
 function LichtLawaai () {
     music.setVolume(200)
     dB = input.soundLevel()
@@ -194,22 +202,14 @@ function wave () {
         `)
     basic.showLeds(`
         # . # . .
-        # . # . #
-        . # . # .
+        # . # # #
+        # # . # .
         . . . . #
-        . . . # .
+        . . . # #
         `)
 }
-function IR_Actie_new () {
-    IRcode = IR.IR_read()
-    leesknop()
-    IRbuffer.pop()
-    Bufstat.pop()
-    CheckControlCode()
-    ToonKnop()
-}
 IR.IR_callbackUser(function () {
-    IR_Actie_new()
+    IR_Actie()
 })
 function ToonKnop () {
     music.stopAllSounds()
@@ -361,6 +361,7 @@ function ToonKnop () {
     }
 }
 function init () {
+    Maqueen_V5.I2CInit()
     serial.redirectToUSB()
     IR.IR_init()
     strip = neopixel.create(DigitalPin.P15, 4, NeoPixelMode.RGB)
@@ -445,6 +446,16 @@ function soundface () {
     }
     SFcount += 1
 }
+function AfstandToon () {
+    afstand = Maqueen_V5.Ultrasonic()
+    toon = 2000 - afstand * 75
+    if (afstand < 20) {
+        toon = 2000 - afstand * 75
+        music.ringTone(toon)
+    } else {
+        music.stopAllSounds()
+    }
+}
 function leesknop () {
     if (IRcode == Afstandsbediening.ster()) {
         IRbuffer.unshift("*")
@@ -516,20 +527,10 @@ function ClearBufStat () {
     Bufstat[2] = ""
     Bufstat[3] = ""
 }
-function afstandToon () {
-    afstand = Maqueen_V5.Ultrasonic()
-    toon = 2000 - afstand * 75
-    if (afstand < 20) {
-        toon = 2000 - afstand * 75
-        music.ringTone(toon)
-    } else {
-        music.stopAllSounds()
-    }
-}
-let afstand = 0
 let avtone = 0
 let som = 0
 let toon = 0
+let afstand = 0
 let SFcount = 0
 let Rkleur = 0
 let strip: neopixel.Strip = null
@@ -543,9 +544,7 @@ let KoplampR = false
 let KoplampL = false
 let LichtLawaaiMode = false
 let Afstandmode = false
-let IRcode = 0
 let mode = ""
-let IRbuffer: string[] = []
 let iscontrolcode = 0
 let isnum = 0
 let ishashcode = 0
@@ -553,19 +552,20 @@ let IsSwitchMode = 0
 let Buf3 = ""
 let Buf2 = ""
 let Buf1 = ""
-let Bufstat: string[] = []
 let Buf0 = ""
 let dB = 0
+let Bufstat: string[] = []
+let IRbuffer: string[] = []
+let IRcode = 0
 let Lkleur = 0
-Maqueen_V5.I2CInit()
 init()
 basic.forever(function () {
-    while (Afstandmode) {
-        afstandToon()
+    while (mode == "verken" && Afstandmode) {
+        AfstandToon()
     }
 })
 basic.forever(function () {
-    while (LichtLawaaiMode) {
+    while (mode == "verken" && LichtLawaaiMode) {
         LichtLawaai()
     }
 })
