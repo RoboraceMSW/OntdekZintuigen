@@ -237,6 +237,23 @@ function ToonKnop () {
                 . . . # #
                 `)
         }
+    } else if (mode == "rijden") {
+        if (IRbuffer[0] == "^") {
+            vooruit = !(vooruit)
+            if (vooruit) {
+                Maqueen_V5.motorRun(Maqueen_V5.Motors.All, Maqueen_V5.Dir.CW, 80)
+            } else {
+                Maqueen_V5.motorStop(Maqueen_V5.Motors.All)
+            }
+        }
+        if (IRbuffer[0] == "v") {
+            achteruit = !(achteruit)
+            if (achteruit) {
+                Maqueen_V5.motorRun(Maqueen_V5.Motors.All, Maqueen_V5.Dir.CCW, 80)
+            } else {
+                Maqueen_V5.motorStop(Maqueen_V5.Motors.All)
+            }
+        }
     } else {
     	
     }
@@ -407,6 +424,8 @@ let toon = 0
 let SFcount = 0
 let Rkleur = 0
 let strip: neopixel.Strip = null
+let achteruit = false
+let vooruit = false
 let Koplampdisco = false
 let KoplampR = false
 let KoplampL = false
