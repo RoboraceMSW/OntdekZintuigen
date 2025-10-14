@@ -31,6 +31,7 @@ function IR_Actie () {
 function LichtLawaai () {
     music.setVolume(200)
     dB = input.soundLevel()
+    Licht = Maqueen_V5.readLightIntensity(Maqueen_V5.DirectionType2.Left) + Maqueen_V5.readLightIntensity(Maqueen_V5.DirectionType2.Right)
     if (dB > 254) {
         music.play(music.builtinPlayableSoundEffect(soundExpression.soaring), music.PlaybackMode.UntilDone)
     } else if (dB > 240) {
@@ -42,6 +43,10 @@ function LichtLawaai () {
     } else {
     	
     }
+    led.plotBarGraph(
+    Licht,
+    0
+    )
     basic.pause(50)
 }
 function CheckControlCode () {
@@ -118,7 +123,7 @@ function Splash () {
         . # . # .
         . . # . .
         `)
-    music.play(music.tonePlayable(294, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.UntilDone)
+    music.play(music.tonePlayable(0 + 0, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.UntilDone)
     basic.showLeds(`
         . # # . .
         . # . # .
@@ -553,6 +558,7 @@ let Buf3 = ""
 let Buf2 = ""
 let Buf1 = ""
 let Buf0 = ""
+let Licht = 0
 let dB = 0
 let Bufstat: string[] = []
 let IRbuffer: string[] = []
