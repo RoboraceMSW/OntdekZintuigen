@@ -34,6 +34,9 @@ function LichtLawaai () {
     } else {
     	
     }
+    serial.writeLine("" + (Maqueen_V5.readLightIntensity(Maqueen_V5.DirectionType2.Left)))
+    serial.writeLine("" + (Maqueen_V5.readLightIntensity(Maqueen_V5.DirectionType2.Right)))
+    serial.writeValue("x", 0)
     basic.pause(50)
 }
 function volg_licht () {
@@ -48,45 +51,6 @@ function volg_licht () {
             Maqueen_V5.motorRun(Maqueen_V5.Motors.All, Maqueen_V5.Dir.CW, 100)
         }
     }
-}
-function CheckControlCode () {
-    Buf0 = Bufstat[0]
-    Buf1 = Bufstat[1]
-    Buf2 = Bufstat[2]
-    Buf3 = Bufstat[3]
-    if (Buf3 == "ster" && (Buf2 == "num" && (Buf1 == "num" && Buf0 == "hekje"))) {
-        IsSwitchMode = 1
-        ishashcode = 0
-        isnum = 0
-        iscontrolcode = 0
-    } else if (Buf1 == "hekje" && Buf0 == "num") {
-        ishashcode = 1
-        IsSwitchMode = 0
-        isnum = 0
-        iscontrolcode = 0
-    } else if (Buf0 == "num") {
-        isnum = 1
-        ishashcode = 0
-        IsSwitchMode = 0
-        iscontrolcode = 0
-    } else if (Buf0 == "ctrl") {
-        iscontrolcode = 1
-        isnum = 0
-        ishashcode = 0
-        IsSwitchMode = 0
-    }
-    if (IsSwitchMode && (IRbuffer[1] == "1" && IRbuffer[2] == "1")) {
-        mode = "verken"
-        music.play(music.stringPlayable("C C E E G G C5 C5 ", 800), music.PlaybackMode.UntilDone)
-        basic.showIcon(IconNames.SmallSquare)
-        basic.showIcon(IconNames.Square)
-    } else if (IsSwitchMode && (IRbuffer[1] == "2" && IRbuffer[2] == "2")) {
-        mode = "rijden"
-        music.play(music.stringPlayable("C5 C5 G G E E C C ", 800), music.PlaybackMode.UntilDone)
-        basic.showIcon(IconNames.SmallDiamond)
-        basic.showIcon(IconNames.Diamond)
-    }
-    IsSwitchMode = 0
 }
 function botsdetectie () {
     if (Math.abs(input.acceleration(Dimension.Z)) > 500) {
@@ -153,7 +117,6 @@ function IR_Actie_new () {
     leesknop()
     IRbuffer.pop()
     Bufstat.pop()
-    CheckControlCode()
     ToonKnop()
 }
 IR.IR_callbackUser(function () {
@@ -619,6 +582,7 @@ let avtone = 0
 let toon = 0
 let afstand = 0
 let Rkleur = 0
+let IsSwitchMode = 0
 let herhaal = 0
 let ccw = 0
 let Koplampdisco = false
@@ -626,19 +590,14 @@ let KoplampR = false
 let KoplampL = false
 let LichtLawaaiMode = false
 let Afstandmode = false
-let IRcode = 0
-let strip: neopixel.Strip = null
-let mode = ""
-let IRbuffer: string[] = []
+let ishashcode = 0
 let iscontrolcode = 0
 let isnum = 0
-let ishashcode = 0
-let IsSwitchMode = 0
-let Buf3 = ""
-let Buf2 = ""
-let Buf1 = ""
+let mode = ""
 let Bufstat: string[] = []
-let Buf0 = ""
+let IRbuffer: string[] = []
+let IRcode = 0
+let strip: neopixel.Strip = null
 let dB = 0
 let Lkleur = 0
 Maqueen_V5.I2CInit()
