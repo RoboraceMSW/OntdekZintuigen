@@ -65,15 +65,89 @@ function CheckControlCode () {
     if (IsSwitchMode && (IRbuffer[1] == "1" && IRbuffer[2] == "1")) {
         mode = "verken"
         music.play(music.stringPlayable("C C E E G G C5 C5 ", 800), music.PlaybackMode.UntilDone)
+        ClearBufStat()
         basic.showIcon(IconNames.SmallSquare)
         basic.showIcon(IconNames.Square)
     } else if (IsSwitchMode && (IRbuffer[1] == "2" && IRbuffer[2] == "2")) {
         mode = "rijden"
+        ClearBufStat()
         music.play(music.stringPlayable("C5 C5 G G E E C C ", 800), music.PlaybackMode.UntilDone)
         basic.showIcon(IconNames.SmallDiamond)
         basic.showIcon(IconNames.Diamond)
     }
     IsSwitchMode = 0
+}
+function Splash () {
+    music.play(music.tonePlayable(294, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.UntilDone)
+    basic.showLeds(`
+        . # # . .
+        . # . # .
+        . # # . .
+        . # . # .
+        . # . # .
+        `)
+    music.play(music.tonePlayable(440, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.UntilDone)
+    basic.showLeds(`
+        . . # . .
+        . # . # .
+        . # . # .
+        . # . # .
+        . . # . .
+        `)
+    music.play(music.tonePlayable(494, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.UntilDone)
+    basic.showLeds(`
+        . # # . .
+        . # . # .
+        . # # . .
+        . # . # .
+        . # # . .
+        `)
+    music.play(music.tonePlayable(440, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.UntilDone)
+    basic.showLeds(`
+        . . # . .
+        . # . # .
+        . # . # .
+        . # . # .
+        . . # . .
+        `)
+    music.play(music.tonePlayable(294, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.UntilDone)
+    basic.showLeds(`
+        . # # . .
+        . # . # .
+        . # # . .
+        . # . # .
+        . # . # .
+        `)
+    music.play(music.tonePlayable(440, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.UntilDone)
+    basic.showLeds(`
+        . . # . .
+        . # . # .
+        . # # # .
+        . # . # .
+        . # . # .
+        `)
+    music.play(music.tonePlayable(523, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.UntilDone)
+    basic.showLeds(`
+        . . # # .
+        . # . . .
+        . # . . .
+        . # . . .
+        . . # # .
+        `)
+    music.play(music.tonePlayable(659, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.UntilDone)
+    basic.showLeds(`
+        . # # # .
+        . # . . .
+        . # # . .
+        . # . . .
+        . # # # .
+        `)
+    music.play(music.tonePlayable(659, music.beat(BeatFraction.Half)), music.PlaybackMode.UntilDone)
+    basic.clearScreen()
+    basic.pause(1000)
+    music.play(music.stringPlayable("C C E E G G C5 C5 ", 800), music.PlaybackMode.UntilDone)
+    basic.showIcon(IconNames.SmallSquare)
+    basic.showIcon(IconNames.Square)
 }
 function wave () {
     basic.showLeds(`
@@ -139,13 +213,6 @@ IR.IR_callbackUser(function () {
 })
 function ToonKnop () {
     music.stopAllSounds()
-    basic.showLeds(`
-        . . . . .
-        . . . . .
-        . . . . .
-        . . . . .
-        . . . . .
-        `)
     if (mode == "verken" && (isnum || iscontrolcode)) {
         Afstandmode = false
         LichtLawaaiMode = false
@@ -241,7 +308,7 @@ function ToonKnop () {
         if (IRbuffer[0] == "^") {
             vooruit = !(vooruit)
             if (vooruit) {
-                Maqueen_V5.motorRun(Maqueen_V5.Motors.All, Maqueen_V5.Dir.CW, 80)
+                Maqueen_V5.motorRun(Maqueen_V5.Motors.All, Maqueen_V5.Dir.CW, 70)
             } else {
                 Maqueen_V5.motorStop(Maqueen_V5.Motors.All)
             }
@@ -249,9 +316,44 @@ function ToonKnop () {
         if (IRbuffer[0] == "v") {
             achteruit = !(achteruit)
             if (achteruit) {
-                Maqueen_V5.motorRun(Maqueen_V5.Motors.All, Maqueen_V5.Dir.CCW, 80)
+                Maqueen_V5.motorRun(Maqueen_V5.Motors.All, Maqueen_V5.Dir.CCW, 70)
             } else {
                 Maqueen_V5.motorStop(Maqueen_V5.Motors.All)
+            }
+        }
+        if (IRbuffer[0] == "<") {
+            LinksAf = !(LinksAf)
+            if (LinksAf) {
+                Maqueen_V5.motorRun(Maqueen_V5.Motors.M1, Maqueen_V5.Dir.CW, 20)
+                Maqueen_V5.motorRun(Maqueen_V5.Motors.M2, Maqueen_V5.Dir.CW, 100)
+            } else {
+                Maqueen_V5.motorStop(Maqueen_V5.Motors.All)
+            }
+        }
+        if (IRbuffer[0] == ">") {
+            RechtsAf = !(RechtsAf)
+            if (RechtsAf) {
+                Maqueen_V5.motorRun(Maqueen_V5.Motors.M1, Maqueen_V5.Dir.CW, 100)
+                Maqueen_V5.motorRun(Maqueen_V5.Motors.M2, Maqueen_V5.Dir.CW, 20)
+            } else {
+                Maqueen_V5.motorStop(Maqueen_V5.Motors.All)
+            }
+        }
+        if (IRbuffer[0] == "OK") {
+            volglijn = !(volglijn)
+            Maqueen_V5.motorStop(Maqueen_V5.Motors.All)
+            if (volglijn) {
+                basic.showLeds(`
+                    # . # . .
+                    # . # . .
+                    . # . # .
+                    . . . # .
+                    . . . # #
+                    `)
+                Maqueen_V5.patrolling(Maqueen_V5.Patrolling.ON)
+            } else {
+                Maqueen_V5.patrolling(Maqueen_V5.Patrolling.OFF)
+                basic.clearScreen()
             }
         }
     } else {
@@ -281,6 +383,7 @@ function init () {
     ishashcode = 0
     IsSwitchMode = 0
     mode = "verken"
+    Splash()
 }
 function setRkleur () {
     Rkleur += 1
@@ -392,7 +495,7 @@ function leesknop () {
         IRbuffer.unshift(">")
         Bufstat.unshift("ctrl")
     } else if (IRcode == Afstandsbediening.ok()) {
-        IRbuffer.unshift("y")
+        IRbuffer.unshift("OK")
         Bufstat.unshift("ctrl")
     }
     music.play(music.tonePlayable(988, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.UntilDone)
@@ -406,6 +509,12 @@ function average (afstand: number) {
         som = som + lijst[index2]
     }
     avtone = som / 10
+}
+function ClearBufStat () {
+    Bufstat[0] = ""
+    Bufstat[1] = ""
+    Bufstat[2] = ""
+    Bufstat[3] = ""
 }
 function afstandToon () {
     afstand = Maqueen_V5.Ultrasonic()
@@ -424,6 +533,9 @@ let toon = 0
 let SFcount = 0
 let Rkleur = 0
 let strip: neopixel.Strip = null
+let volglijn = false
+let RechtsAf = false
+let LinksAf = false
 let achteruit = false
 let vooruit = false
 let Koplampdisco = false
@@ -455,5 +567,14 @@ basic.forever(function () {
 basic.forever(function () {
     while (LichtLawaaiMode) {
         LichtLawaai()
+    }
+})
+basic.forever(function () {
+    while (mode == "rijden" && volglijn) {
+        if (Maqueen_V5.Ultrasonic() < 7) {
+            volglijn = false
+            Maqueen_V5.patrolling(Maqueen_V5.Patrolling.OFF)
+            Maqueen_V5.motorStop(Maqueen_V5.Motors.All)
+        }
     }
 })
