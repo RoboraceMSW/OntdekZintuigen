@@ -20,6 +20,22 @@ function setLkleur () {
         Maqueen_V5.setRgblLed(Maqueen_V5.DirectionType.Left, Maqueen_V5.CarLightColors.Black)
     }
 }
+function LichtLawaai () {
+    music.setVolume(200)
+    dB = input.soundLevel()
+    if (dB > 254) {
+        music.play(music.builtinPlayableSoundEffect(soundExpression.soaring), music.PlaybackMode.UntilDone)
+    } else if (dB > 240) {
+        music.play(music.builtinPlayableSoundEffect(soundExpression.giggle), music.PlaybackMode.UntilDone)
+    } else if (dB > 230) {
+        music.play(music.builtinPlayableSoundEffect(soundExpression.twinkle), music.PlaybackMode.UntilDone)
+    } else if (dB > 220) {
+        music.play(music.builtinPlayableSoundEffect(soundExpression.yawn), music.PlaybackMode.UntilDone)
+    } else {
+    	
+    }
+    basic.pause(50)
+}
 function volg_licht () {
     if (Maqueen_V5.readLightIntensity(Maqueen_V5.DirectionType2.Left) + Maqueen_V5.readLightIntensity(Maqueen_V5.DirectionType2.Right) > 3000) {
         if (Maqueen_V5.readLightIntensity(Maqueen_V5.DirectionType2.Left) < Maqueen_V5.readLightIntensity(Maqueen_V5.DirectionType2.Right) + 200) {
@@ -48,7 +64,6 @@ function CheckControlCode () {
         IsSwitchMode = 0
         isnum = 0
         iscontrolcode = 0
-        music.play(music.tonePlayable(523, music.beat(BeatFraction.Whole)), music.PlaybackMode.UntilDone)
     } else if (Buf0 == "num") {
         isnum = 1
         ishashcode = 0
@@ -63,9 +78,13 @@ function CheckControlCode () {
     if (IsSwitchMode && (IRbuffer[1] == "1" && IRbuffer[2] == "1")) {
         mode = "verken"
         music.play(music.stringPlayable("C C E E G G C5 C5 ", 800), music.PlaybackMode.UntilDone)
+        basic.showIcon(IconNames.SmallSquare)
+        basic.showIcon(IconNames.Square)
     } else if (IsSwitchMode && (IRbuffer[1] == "2" && IRbuffer[2] == "2")) {
         mode = "rijden"
         music.play(music.stringPlayable("C5 C5 G G E E C C ", 800), music.PlaybackMode.UntilDone)
+        basic.showIcon(IconNames.SmallDiamond)
+        basic.showIcon(IconNames.Diamond)
     }
     IsSwitchMode = 0
 }
@@ -77,6 +96,57 @@ function botsdetectie () {
     basic.pause(2 * 500)
     strip.clear()
     strip.show()
+}
+function wave () {
+    basic.showLeds(`
+        . . . . .
+        . . . . .
+        . . . . .
+        . . . . .
+        # . . . .
+        `)
+    basic.showLeds(`
+        . . . . .
+        . . . . .
+        . . . . .
+        # # . . .
+        . # . . .
+        `)
+    basic.showLeds(`
+        . . . . .
+        . . . . .
+        # # . . .
+        . . # . .
+        . . # . .
+        `)
+    basic.showLeds(`
+        . . . . .
+        # # . . .
+        . . # . .
+        . . . # .
+        . . . # .
+        `)
+    basic.showLeds(`
+        # # # . .
+        . . . # .
+        . . . . #
+        . . . . #
+        . . . . #
+        `)
+    basic.showLeds(`
+        . . . # .
+        . . . . #
+        . . . . .
+        . . . . .
+        . . . . .
+        `)
+    basic.showLeds(`
+        # . # . .
+        # . # . #
+        . # . # .
+        . . . . #
+        . . . # .
+        `)
 }
 function IR_Actie_new () {
     IRcode = IR.IR_read()
@@ -90,7 +160,17 @@ IR.IR_callbackUser(function () {
     IR_Actie_new()
 })
 function ToonKnop () {
+    music.stopAllSounds()
+    basic.showLeds(`
+        . . . . .
+        . . . . .
+        . . . . .
+        . . . . .
+        . . . . .
+        `)
     if (mode == "verken" && (isnum || iscontrolcode)) {
+        Afstandmode = false
+        LichtLawaaiMode = false
         if (IRcode == Afstandsbediening.een()) {
             basic.showNumber(1)
         } else if (IRcode == Afstandsbediening.twee()) {
@@ -167,9 +247,17 @@ function ToonKnop () {
             basic.pause(1000)
             Maqueen_V5.motorStop(Maqueen_V5.Motors.All)
         } else if (IRbuffer[0] == "9") {
-        	
+            Afstandmode = !(Afstandmode)
+            wave()
         } else if (IRbuffer[0] == "0") {
-        	
+            LichtLawaaiMode = !(LichtLawaaiMode)
+            basic.showLeds(`
+                # . . . .
+                # . . . .
+                # # . # .
+                . . . # .
+                . . . # #
+                `)
         }
     } else {
     	
@@ -511,6 +599,16 @@ function average (afstand: number) {
     }
     avtone = som / 10
 }
+function afstandToon () {
+    afstand = Maqueen_V5.Ultrasonic()
+    toon = 2000 - afstand * 75
+    if (afstand < 20) {
+        toon = 2000 - afstand * 75
+        music.ringTone(toon)
+    } else {
+        music.stopAllSounds()
+    }
+}
 let som = 0
 let wasaan = 0
 let lowspeed = 0
@@ -526,6 +624,8 @@ let ccw = 0
 let Koplampdisco = false
 let KoplampR = false
 let KoplampL = false
+let LichtLawaaiMode = false
+let Afstandmode = false
 let IRcode = 0
 let strip: neopixel.Strip = null
 let mode = ""
@@ -539,14 +639,19 @@ let Buf2 = ""
 let Buf1 = ""
 let Bufstat: string[] = []
 let Buf0 = ""
+let dB = 0
 let Lkleur = 0
 Maqueen_V5.I2CInit()
 init()
 basic.forever(function () {
-	
+    while (Afstandmode) {
+        afstandToon()
+    }
 })
 basic.forever(function () {
-	
+    while (LichtLawaaiMode) {
+        LichtLawaai()
+    }
 })
 basic.forever(function () {
 	
