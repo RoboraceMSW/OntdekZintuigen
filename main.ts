@@ -1,6 +1,57 @@
 /**
  * Kennismakingsprogramma om sensoren en actuatoren te leren kennen
  */
+function Wave () {
+    basic.showLeds(`
+        . . . . .
+        . . . . .
+        . . . . .
+        . . . . .
+        # . . . .
+        `)
+    basic.showLeds(`
+        . . . . .
+        . . . . .
+        . . . . .
+        # # . . .
+        . # . . .
+        `)
+    basic.showLeds(`
+        . . . . .
+        . . . . .
+        # # . . .
+        . . # . .
+        . . # . .
+        `)
+    basic.showLeds(`
+        . . . . .
+        # # . . .
+        . . # . .
+        . . . # .
+        . . . # .
+        `)
+    basic.showLeds(`
+        # # # . .
+        . . . # .
+        . . . . #
+        . . . . #
+        . . . . #
+        `)
+    basic.showLeds(`
+        . . . # .
+        . . . . #
+        . . . . .
+        . . . . .
+        . . . . .
+        `)
+    basic.showLeds(`
+        # . # . .
+        # . # # #
+        # # . # .
+        . . . . #
+        . . . # #
+        `)
+}
 function setLkleur () {
     Lkleur += 1
     Lkleur = Lkleur % 7
@@ -22,7 +73,7 @@ function setLkleur () {
 }
 function IR_Actie () {
     IRcode = IR.IR_read()
-    leesknop()
+    LeesKnop()
     IRbuffer.pop()
     Bufstat.pop()
     CheckControlCode()
@@ -162,56 +213,60 @@ function Splash () {
     basic.showIcon(IconNames.SmallSquare)
     basic.showIcon(IconNames.Square)
 }
-function wave () {
-    basic.showLeds(`
-        . . . . .
-        . . . . .
-        . . . . .
-        . . . . .
-        # . . . .
-        `)
-    basic.showLeds(`
-        . . . . .
-        . . . . .
-        . . . . .
-        # # . . .
-        . # . . .
-        `)
-    basic.showLeds(`
-        . . . . .
-        . . . . .
-        # # . . .
-        . . # . .
-        . . # . .
-        `)
-    basic.showLeds(`
-        . . . . .
-        # # . . .
-        . . # . .
-        . . . # .
-        . . . # .
-        `)
-    basic.showLeds(`
-        # # # . .
-        . . . # .
-        . . . . #
-        . . . . #
-        . . . . #
-        `)
-    basic.showLeds(`
-        . . . # .
-        . . . . #
-        . . . . .
-        . . . . .
-        . . . . .
-        `)
-    basic.showLeds(`
-        # . # . .
-        # . # # #
-        # # . # .
-        . . . . #
-        . . . # #
-        `)
+function LeesKnop () {
+    if (IRcode == Afstandsbediening.ster()) {
+        IRbuffer.unshift("*")
+        Bufstat.unshift("ster")
+    } else if (IRcode == Afstandsbediening.hekje()) {
+        IRbuffer.unshift("#")
+        Bufstat.unshift("hekje")
+    } else if (IRcode == Afstandsbediening.een()) {
+        IRbuffer.unshift("1")
+        Bufstat.unshift("num")
+    } else if (IRcode == Afstandsbediening.twee()) {
+        IRbuffer.unshift("2")
+        Bufstat.unshift("num")
+    } else if (IRcode == Afstandsbediening.drie()) {
+        IRbuffer.unshift("3")
+        Bufstat.unshift("num")
+    } else if (IRcode == Afstandsbediening.vier()) {
+        IRbuffer.unshift("4")
+        Bufstat.unshift("num")
+    } else if (IRcode == Afstandsbediening.vijf()) {
+        IRbuffer.unshift("5")
+        Bufstat.unshift("num")
+    } else if (IRcode == Afstandsbediening.zes()) {
+        IRbuffer.unshift("6")
+        Bufstat.unshift("num")
+    } else if (IRcode == Afstandsbediening.zeven()) {
+        IRbuffer.unshift("7")
+        Bufstat.unshift("num")
+    } else if (IRcode == Afstandsbediening.acht()) {
+        IRbuffer.unshift("8")
+        Bufstat.unshift("num")
+    } else if (IRcode == Afstandsbediening.negen()) {
+        IRbuffer.unshift("9")
+        Bufstat.unshift("num")
+    } else if (IRcode == Afstandsbediening.nul()) {
+        IRbuffer.unshift("0")
+        Bufstat.unshift("num")
+    } else if (IRcode == Afstandsbediening.op()) {
+        IRbuffer.unshift("^")
+        Bufstat.unshift("ctrl")
+    } else if (IRcode == Afstandsbediening.neer()) {
+        IRbuffer.unshift("v")
+        Bufstat.unshift("ctrl")
+    } else if (IRcode == Afstandsbediening.links()) {
+        IRbuffer.unshift("<")
+        Bufstat.unshift("ctrl")
+    } else if (IRcode == Afstandsbediening.rechts()) {
+        IRbuffer.unshift(">")
+        Bufstat.unshift("ctrl")
+    } else if (IRcode == Afstandsbediening.ok()) {
+        IRbuffer.unshift("OK")
+        Bufstat.unshift("ctrl")
+    }
+    music.play(music.tonePlayable(988, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.UntilDone)
 }
 IR.IR_callbackUser(function () {
     IR_Actie()
@@ -285,7 +340,7 @@ function ToonKnop () {
                 Maqueen_V5.setRgbOff(Maqueen_V5.DirectionType.All)
             }
         } else if (IRbuffer[0] == "6") {
-            soundface()
+            SoundFace()
         } else if (IRbuffer[0] == "7") {
             Maqueen_V5.motorRun(Maqueen_V5.Motors.M1, Maqueen_V5.Dir.CW, 130)
             Maqueen_V5.motorRun(Maqueen_V5.Motors.M2, Maqueen_V5.Dir.CCW, 130)
@@ -298,7 +353,7 @@ function ToonKnop () {
             Maqueen_V5.motorStop(Maqueen_V5.Motors.All)
         } else if (IRbuffer[0] == "9") {
             Afstandmode = !(Afstandmode)
-            wave()
+            Wave()
         } else if (IRbuffer[0] == "0") {
             LichtLawaaiMode = !(LichtLawaaiMode)
             basic.showLeds(`
@@ -410,7 +465,17 @@ function setRkleur () {
         Maqueen_V5.setRgblLed(Maqueen_V5.DirectionType.Right, Maqueen_V5.CarLightColors.Black)
     }
 }
-function soundface () {
+function AfstandToon () {
+    afstand = Maqueen_V5.Ultrasonic()
+    toon = 2000 - afstand * 75
+    if (afstand < 20) {
+        toon = 2000 - afstand * 75
+        music.ringTone(toon)
+    } else {
+        music.stopAllSounds()
+    }
+}
+function SoundFace () {
     SFcount = SFcount % 4
     if (SFcount == 0) {
         basic.showLeds(`
@@ -451,71 +516,6 @@ function soundface () {
     }
     SFcount += 1
 }
-function AfstandToon () {
-    afstand = Maqueen_V5.Ultrasonic()
-    toon = 2000 - afstand * 75
-    if (afstand < 20) {
-        toon = 2000 - afstand * 75
-        music.ringTone(toon)
-    } else {
-        music.stopAllSounds()
-    }
-}
-function leesknop () {
-    if (IRcode == Afstandsbediening.ster()) {
-        IRbuffer.unshift("*")
-        Bufstat.unshift("ster")
-    } else if (IRcode == Afstandsbediening.hekje()) {
-        IRbuffer.unshift("#")
-        Bufstat.unshift("hekje")
-    } else if (IRcode == Afstandsbediening.een()) {
-        IRbuffer.unshift("1")
-        Bufstat.unshift("num")
-    } else if (IRcode == Afstandsbediening.twee()) {
-        IRbuffer.unshift("2")
-        Bufstat.unshift("num")
-    } else if (IRcode == Afstandsbediening.drie()) {
-        IRbuffer.unshift("3")
-        Bufstat.unshift("num")
-    } else if (IRcode == Afstandsbediening.vier()) {
-        IRbuffer.unshift("4")
-        Bufstat.unshift("num")
-    } else if (IRcode == Afstandsbediening.vijf()) {
-        IRbuffer.unshift("5")
-        Bufstat.unshift("num")
-    } else if (IRcode == Afstandsbediening.zes()) {
-        IRbuffer.unshift("6")
-        Bufstat.unshift("num")
-    } else if (IRcode == Afstandsbediening.zeven()) {
-        IRbuffer.unshift("7")
-        Bufstat.unshift("num")
-    } else if (IRcode == Afstandsbediening.acht()) {
-        IRbuffer.unshift("8")
-        Bufstat.unshift("num")
-    } else if (IRcode == Afstandsbediening.negen()) {
-        IRbuffer.unshift("9")
-        Bufstat.unshift("num")
-    } else if (IRcode == Afstandsbediening.nul()) {
-        IRbuffer.unshift("0")
-        Bufstat.unshift("num")
-    } else if (IRcode == Afstandsbediening.op()) {
-        IRbuffer.unshift("^")
-        Bufstat.unshift("ctrl")
-    } else if (IRcode == Afstandsbediening.neer()) {
-        IRbuffer.unshift("v")
-        Bufstat.unshift("ctrl")
-    } else if (IRcode == Afstandsbediening.links()) {
-        IRbuffer.unshift("<")
-        Bufstat.unshift("ctrl")
-    } else if (IRcode == Afstandsbediening.rechts()) {
-        IRbuffer.unshift(">")
-        Bufstat.unshift("ctrl")
-    } else if (IRcode == Afstandsbediening.ok()) {
-        IRbuffer.unshift("OK")
-        Bufstat.unshift("ctrl")
-    }
-    music.play(music.tonePlayable(988, music.beat(BeatFraction.Sixteenth)), music.PlaybackMode.UntilDone)
-}
 function average (afstand: number) {
     let lijst: number[] = []
     lijst.pop()
@@ -534,9 +534,9 @@ function ClearBufStat () {
 }
 let avtone = 0
 let som = 0
+let SFcount = 0
 let toon = 0
 let afstand = 0
-let SFcount = 0
 let Rkleur = 0
 let strip: neopixel.Strip = null
 let volglijn = false
