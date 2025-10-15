@@ -1,5 +1,5 @@
 /**
- * Kennismakingsprogramma om sensoren en actuatoren te leren kennen
+ * Kennismakingsprogramma om sensoren en actuatoren van Maqueen Robot en de Micro:bit te leren kennen
  */
 function Wave () {
     basic.showLeds(`
