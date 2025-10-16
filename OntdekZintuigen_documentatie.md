@@ -54,8 +54,8 @@
       * Indien afstand <20cm laat geluid horen, daarboven geluid uit
    * [**LichtLawaai**](#function-lichtlawaai)
       *  zet volume hoog
-      *  bepaal geluidsniveau, ken toe aan dB
-      *  laat geluidsniveauafhankelijk riedeltje hoeren
+      *  bepaal geluidsniveau, ken toe aan variabele dB
+      *  laat geluidsniveauafhankelijk riedeltje horen
    * [**ClearBufStat**](#function-clearbufstat)
       * Leeg de IR ontvangstbuffers na modechange
    * [**IR_actie**](#function-ir_actie)
