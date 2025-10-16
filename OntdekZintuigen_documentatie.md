@@ -63,7 +63,7 @@
       * Aanroep [**LeesKnop**](#function-leesknop)
       * Voeg geinterpreteerde code toe aan buffer
       * Verwijder oudste waarde in buffer (buffer lengte 4, om Modeswitch te kunnen detecteren)
-      * Aanroep [**CheckControlCode**](#function-checkcontrolcode]
+      * Aanroep [**CheckControlCode**](#function-checkcontrolcode)
    * [**LeesKnop**](#function-leesknop)
       * Evalueer ruwe IR code, wijs functioneel label en statuslabel toe (num,ster,hekje,control) en voeg toe aan IR-buffer en Status-buffer
    *  [**CheckControlCode**](#function-checkcontrolcode)
